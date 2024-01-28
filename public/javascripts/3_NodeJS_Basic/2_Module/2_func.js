@@ -3,8 +3,10 @@ const {odd,even}=require('./1_var');
 
 function checkOddOrEven(num) {
 
-    if(num%2==0) {
+    if(num%2) {
         return even;
     }
     return odd;
 }
+
+module.exports=checkOddOrEven;
