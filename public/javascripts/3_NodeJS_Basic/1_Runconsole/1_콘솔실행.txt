@@ -1,0 +1,9 @@
+1. Alt + F12 (또는 도스 커맨드 창 실행: Windows + r , cmd)
+3. 아래 명령어 입력
+node
+2. 아래 코드를 콘솔에 입력
+let str = 'Hello World!';
+console.log(str);
+3. 방향키로 과거 실행문을 로드하여 다시 실행
+let str = 'Hello Node!';
+console.log(str);
