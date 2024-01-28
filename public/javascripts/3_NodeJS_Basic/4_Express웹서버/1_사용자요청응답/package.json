@@ -1,0 +1,17 @@
+{
+  "name": "learn-express",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "nodemon app"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.1",
+    "express": "^4.17.3",
+    "express-session": "^1.17.3",
+    "morgan": "^1.10.0"
+  }
+}
