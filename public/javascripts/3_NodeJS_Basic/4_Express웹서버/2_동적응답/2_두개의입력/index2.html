@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>덧셈 계산기</title>
+</head>
+<body>
+<!-- 폼태그에서 전송하는 데이터는 post방식으로 한다 -->
+<form action="http://localhost:3000/processInput" method="post">
+    <label for="inputNumber1">첫 번째 숫자를 입력하세요:</label>
+    <input type="text" id="inputNumber1" name="inputNumber1" required>
+    <br>
+    <label for="inputNumber2">두 번째 숫자를 입력하세요:</label>
+    <input type="text" id="inputNumber2" name="inputNumber2" required>
+    <br>
+    <button type="submit">덧셈 계산</button>
+</form>
+</body>
+</html>
