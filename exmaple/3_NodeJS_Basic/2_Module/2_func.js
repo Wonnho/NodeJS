@@ -1,5 +1,5 @@
 //외부 모듈의 요소를 가져오는 문법
-const {odd,even}=require('./1_var');
+const {odd,even}=require('./1_Var');
 
 function checkOddOrEven(num) {
 

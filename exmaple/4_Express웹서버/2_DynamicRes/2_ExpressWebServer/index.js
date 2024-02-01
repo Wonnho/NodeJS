@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 
 app.get('/',(req,res)=>{
-    res.sendFile(__dirname+'/3_index.html')
+    res.sendFile(__dirname+'/public/index.html')
 
 })
 
