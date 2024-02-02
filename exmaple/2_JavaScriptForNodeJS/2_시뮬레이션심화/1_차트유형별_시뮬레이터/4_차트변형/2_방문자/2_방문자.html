@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor and Sales Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+</head>
+<body>
+<div>
+    <h2>Visitor Chart</h2>
+    <canvas id="visitorChart" width="300" height="150"></canvas>
+</div>
+<div>
+    <h2>Sales Chart</h2>
+    <canvas id="salesChart" width="300" height="150"></canvas>
+</div>
+
+<script>
+    const visitorCtx = document.getElementById('visitorChart').getContext('2d');
+    const visitorData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+            label: '방문자',
+            backgroundColor: window.chartColors.red,
+            borderColor: window.chartColors.red,
+            data: [22, 15, 66, 30, 36, 53, 31],
+        }]
+    };
+    const visitorConfig = {
+        type: 'bar',
+        data: visitorData,
+        maintainAspectRatio: false,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+    new Chart(visitorCtx, visitorConfig);
+
+
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesData = {
+        labels: Samples.utils.months({ count: 7 }),
+        datasets: [{
+            label: '판매량',
+            backgroundColor: window.chartColors.green,
+            borderColor: window.chartColors.green,
+            fill: false,
+            data: [5, 3, 8, 4, 10, 2, 5],
+        }]
+    };
+    const salesConfig = {
+        type: 'line',
+        data: salesData,
+        maintainAspectRatio: false,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+    new Chart(salesCtx, salesConfig);
+</script>
+</body>
+</html>

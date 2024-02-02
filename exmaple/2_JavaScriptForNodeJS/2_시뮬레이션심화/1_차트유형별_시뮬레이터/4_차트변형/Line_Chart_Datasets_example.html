@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="utils.js"></script>
+</head>
+<body>
+
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('myChart');
+
+    const inputs = {
+        min: 20,
+        max: 80,
+        count: 8,
+        decimals: 2,
+        continuity: 1
+    };
+
+    const generateLabels = () => {
+        return Samples.utils.months({count: inputs.count});
+    };
+
+    const generateData = () => (Samples.utils.numbers(inputs));
+
+    Samples.utils.srand(42);
+
+
+    let smooth = false;
+    let propagate = false;
+
+    const actions = [
+        {
+            name: 'Randomize',
+            handler(chart) {
+                chart.data.datasets.forEach(dataset => {
+                    dataset.data = generateData();
+                });
+                chart.update();
+            }
+        },
+        {
+            name: 'Propagate',
+            handler(chart) {
+                propagate = !propagate;
+                chart.options.plugins.filler.propagate = propagate;
+                chart.update();
+            }
+        },
+        {
+            name: 'Smooth',
+            handler(chart) {
+                smooth = !smooth;
+                chart.options.elements.line.tension = smooth ? 0.4 : 0;
+                chart.update();
+            }
+        }
+    ];
+
+
+
+    // Chart(ctx, [config])
+
+    const config = {
+        type: 'line',
+        data: {
+            labels: generateLabels(),
+            datasets: [
+                {
+                    label: '스니커즈',
+                    data: generateData(),
+                    borderColor: 'red',
+                    backgroundColor: 'red',
+                    hidden: true
+                },
+                {
+                    label: '러닝화',
+                    data: generateData(),
+                    borderColor: 'orange',
+                    backgroundColor: 'orange',
+                    fill: '-1'
+                },
+                {
+                    label: '슬립온',
+                    data: generateData(),
+                    borderColor: 'yellow',
+                    backgroundColor: 'yellow',
+                    hidden: true,
+                    fill: 1
+                },
+                {
+                    label: '부츠',
+                    data: generateData(),
+                    borderColor: 'green',
+                    backgroundColor: 'green',
+                    fill: '-1'
+                },
+                {
+                    label: '슬리퍼',
+                    data: generateData(),
+                    borderColor: 'blue',
+                    backgroundColor: 'blue',
+                    fill: '-1'
+                },
+                {
+                    label: '축구화',
+                    data: generateData(),
+                    borderColor: 'grey',
+                    backgroundColor: 'grey',
+                    fill: '+2'
+                },
+                {
+                    label: '하이킹부츠',
+                    data: generateData(),
+                    borderColor: 'purple',
+                    backgroundColor: 'purple',
+                    fill: false
+                },
+                {
+                    label: '워커',
+                    data: generateData(),
+                    borderColor: 'red',
+                    backgroundColor: 'red',
+                    fill: 8
+                }
+              
+            ]
+
+        },
+        options: {
+            scales: {
+                y: {
+                    stacked: true
+                }
+            },
+            plugins: {
+                filler: {
+                    propagate: false
+                },
+                'samples-filler-analyser': {
+                    target: 'chart-analyser'
+                }
+            },
+            interaction: {
+                intersect: false,
+            },
+        },
+    };
+    new Chart(ctx, config);
+
+
+
+</script>
+
+
+</body>
+</html>
