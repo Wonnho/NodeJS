@@ -1,0 +1,27 @@
+<!--
+NodeJS의 결과가 html에 전송되어 표시될 경우
+html 코드 NodeJS 코드를 삽입하여 활용하는
+시뮬레이션 코드를 만들 수 있다.
+-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Log Example</title>
+</head>
+<body>
+
+<script>
+    // JavaScript 코드
+    let val1 = 1;
+    let val2 = 10;
+
+    let result = val1 + val2;
+
+    document.write(val1 + ' + ' + val2 + ' = ' + result + '<br>');   // 덧셈 연산자를 활용한 스타일
+    document.write(`${val1} + ${val2} = ${result}<br>`);       // 리터럴 포맷을 사용한 스타일
+</script>
+
+</body>
+</html>
