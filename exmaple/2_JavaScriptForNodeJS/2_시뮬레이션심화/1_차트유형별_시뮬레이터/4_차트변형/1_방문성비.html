@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gender Ratio Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div style="width: 60%; margin: auto;">
+    <canvas id="genderChart"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('genderChart').getContext('2d');
+
+    const data = {
+        labels: ['Man', 'Woman'],
+        datasets: [{
+            label: '슈즈랩 방문성비율',
+            data: [55, 45],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const config = {
+        type: 'pie',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '슈즈랩 방문성비율'
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+            },
+        },
+    };
+
+    new Chart(ctx, config);
+</script>
+
+</body>
+</html>
