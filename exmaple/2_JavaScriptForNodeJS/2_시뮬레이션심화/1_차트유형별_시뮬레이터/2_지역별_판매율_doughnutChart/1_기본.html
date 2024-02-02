@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지역별 판매 이율</title>
+  <!-- Chart.js 라이브러리 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div style="width:45%; margin:auto;">
+  <canvas id="salesChart"></canvas>
+</div>
+
+<script>
+  // 지역별 판매 이율 데이터
+  const regionalSalesData = {
+    labels: ['서울', '부산', '인천', '대구', '광주'],
+    percentages: [35, 25, 10, 12, 17],
+  };
+
+  // Chart.js를 사용하여 도우넛 차트 생성
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  const salesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: regionalSalesData.labels,
+      datasets: [{
+        data: regionalSalesData.percentages,
+        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        borderColor: 'white',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      cutout: '70%', // Adjust the size of the hole in the middle (70% in this example)
+    }
+  });
+
+  // 실시간으로 데이터 업데이트하는 함수
+  function updateData() {
+    // Assuming you want to update percentages randomly
+    const newData = regionalSalesData.percentages.map(value => value + Math.floor(Math.random() * 10));
+    salesChart.data.datasets[0].data = newData;
+    salesChart.update(); // 차트 업데이트
+  }
+
+  // 2초마다 데이터 업데이트
+  setInterval(updateData, 2000);
+</script>
+</body>
+</html>

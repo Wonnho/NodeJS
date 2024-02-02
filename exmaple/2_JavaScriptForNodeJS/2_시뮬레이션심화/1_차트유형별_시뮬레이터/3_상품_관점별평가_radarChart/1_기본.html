@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인기상품 실시간 판매량</title>
+  <!-- Chart.js 라이브러리 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div style="width:45%; margin:auto;">
+
+  <!-- Radar Chart for Product A -->
+  <canvas id="productARadarChart"></canvas>
+
+</div>
+
+<script>
+  // 5개의 관점 정의
+  const perspectives = ['가격', '품질', '고객 리뷰', '배송 속도', '내구성'];;
+
+  // 초기 평가 데이터 생성 (A 상품)
+  const initialDataA = perspectives.map(() => Math.floor(Math.random() * 5));
+
+  // Chart.js를 사용하여 레이더 차트 생성 (A 상품)
+  const ctxProductA = document.getElementById('productARadarChart').getContext('2d');
+  const radarChartProductA = new Chart(ctxProductA, {
+    type: 'radar',
+    data: {
+      labels: perspectives,
+      datasets: [{
+        label: '상품A 평가',
+        data: initialDataA,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // 실시간으로 데이터 업데이트하는 함수 (A 상품)
+  function updateDataProductA() {
+    const newDataA = radarChartProductA.data.datasets[0].data.map(value => value + Math.floor(Math.random() * 3));
+    radarChartProductA.data.datasets[0].data = newDataA;
+    radarChartProductA.update(); // 레이더 차트 업데이트
+  }
+
+  setInterval(updateDataProductA, 2000);
+</script>
+</body>
+</html>
