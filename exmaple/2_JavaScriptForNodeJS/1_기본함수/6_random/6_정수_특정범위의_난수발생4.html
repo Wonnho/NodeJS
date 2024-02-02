@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Integer in Range</title>
+</head>
+<body>
+<script>
+
+
+    // HTML 페이지에 출력할 텍스트 초기화
+    var outputText = "<h1>Math.random() * max 예제 - 10개의 난수</h1><ul>";
+
+    const max = 3;
+    const min = 1;
+    // 10개의 난수 생성 및 출력 텍스트에 추가
+    for (var i = 0; i < 10; i++) {
+        var randomNumber = Math.random() * max;
+        outputText += "<li>결과 " + (i + 1) + ": " + randomNumber + "</li>";
+    }
+
+    // max가 1인 경우 최대 값: 0.99999... * 1 => 0.9999.. (0이상~1미만): 내림으로 표현할 수 있는 정수 범위: 0
+    // max가 2인 경우 최대 값: 0.99999... * 2 => 1.9999.. (0이상~2미만): 내림으로 표현할 수 있는 정수 범위: 0,1
+    // max가 3인 경우 최대 값: 0.99999... * 3 => 2.9999.. (0이상~3미만): 내림으로 표현할 수 있는 정수 범위: 0,1,2
+
+
+    // 출력 텍스트에 닫는 태그 추가
+    outputText += "</ul>";
+
+    outputText += "<h1>Math.floor(Math.random()) * max 예제 - min~max 정수형 난수2</h1><ul>";
+    // min이상 max미만의 값을 처리하기 위한 과정
+    for (var i = 0; i < 10; i++) {
+
+        var randomNumber = Math.floor(Math.random() * (max-min + 1) ) ; // 처리 범위 0,1,2 : 처리 범위는 맞으나 min, max 값이 틀리다.
+        outputText += "<li>결과 " + (i + 1) + ": " + randomNumber + "</li>";
+    }
+
+    // HTML 페이지에 출력
+    document.write(outputText);
+</script>
+</body>
+</html>

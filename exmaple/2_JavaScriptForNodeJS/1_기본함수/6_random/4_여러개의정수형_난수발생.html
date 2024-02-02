@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple Random Numbers</title>
+</head>
+<body>
+<script>
+    // HTML 페이지에 출력할 텍스트 초기화
+    var outputText = "<h1>Math.random() 예제 - 10개의 난수</h1><ul>";
+
+    // 10개의 난수 생성 및 출력 텍스트에 추가
+    for (var i = 0; i < 10; i++) {
+        var randomNumber = Math.floor(Math.random() * 10);
+        outputText += "<li>결과 " + (i + 1) + ": " + randomNumber + "</li>";
+    }
+
+    // 출력 텍스트에 닫는 태그 추가
+    outputText += "</ul>";
+
+    // HTML 페이지에 출력
+    document.write(outputText);
+</script>
+</body>
+</html>
