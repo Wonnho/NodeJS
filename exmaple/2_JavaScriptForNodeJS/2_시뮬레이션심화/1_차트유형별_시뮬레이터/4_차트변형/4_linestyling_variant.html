@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="utils.js"></script>
+</head>
+<body>
+<div style="width:80%;margin:auto;">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('myChart');
+
+    const DATA_COUNT = 7;
+    const NUMBER_CFG = {count: DATA_COUNT, min: -100, max: 100};
+
+    //const labels = Utils.months({count: DATA_COUNT});
+    const labels=Samples.utils.months({count:DATA_COUNT});
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Unfilled',
+                fill: false,
+                backgroundColor: 'blue',
+                borderColor: 'blue',
+                data: Samples.utils.numbers(NUMBER_CFG),
+            }, {
+                label: 'Dashed',
+                fill: false,
+                backgroundColor: 'green',
+                borderColor: 'green',
+                borderDash: [5, 5],
+                data: Samples.utils.numbers(NUMBER_CFG),
+            }, {
+                label: 'Filled',
+                backgroundColor: 'red',
+                borderColor: 'red',
+                data: Samples.utils.numbers(NUMBER_CFG),
+                fill: true,
+            }
+        ]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Chart.js Line Chart'
+                },
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            }
+        },
+    };
+    new Chart(ctx, config  );
+</script>
+
+</body>
+</html>
