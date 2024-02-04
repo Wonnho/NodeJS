@@ -1,0 +1,37 @@
+<!-- views/integrated.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 예제</title>
+</head>
+<body>
+<h2>산술 연산자 예제:</h2>
+<% let a = 5; %>
+<% let b = 3; %>
+<p>합: <%= a + b %> (a=<%= a %>, b=<%= b %>)</p>
+<p>뺄셈: <%= a - b %> (a=<%= a %>, b=<%= b %>)</p>
+<p>곱셈: <%= a * b %> (a=<%= a %>, b=<%= b %>)</p>
+<p>나눗셈: <%= a / b %> (a=<%= a %>, b=<%= b %>)</p>
+<p>나머지: <%= a % b %> (a=<%= a %>, b=<%= b %>)</p>
+
+<h2>논리 연산자 예제:</h2>
+<% let x = true; %>
+<% let y = false; %>
+<p>AND: <%= x && y %> (x=<%= x %>, y=<%= y %>)</p>
+<p>OR: <%= x || y %> (x=<%= x %>, y=<%= y %>)</p>
+<p>NOT: <%= !x %> (x=<%= x %>)</p>
+
+<h2>비교 연산자 예제:</h2>
+<% let m = 10; %>
+<% let n = 5; %>
+<p>Equal: <%= m == n %> (m=<%= m %>, n=<%= n %>)</p>
+<p>Not Equal: <%= m != n %> (m=<%= m %>, n=<%= n %>)</p>
+<p>Greater Than: <%= m > n %> (m=<%= m %>, n=<%= n %>)</p>
+<p>Less Than: <%= m < n %> (m=<%= m %>, n=<%= n %>)</p>
+<p>Greater Than or Equal: <%= m >= n %> (m=<%= m %>, n=<%= n %>)</p>
+<p>Less Than or Equal: <%= m <= n %> (m=<%= m %>, n=<%= n %>)</p>
+</body>
+</html>
