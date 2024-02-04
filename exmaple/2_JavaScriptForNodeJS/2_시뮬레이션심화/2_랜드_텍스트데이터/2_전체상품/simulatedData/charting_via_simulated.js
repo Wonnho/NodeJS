@@ -12,3 +12,7 @@ for(let k=1;maxNum;k++) {
 }
 
 
+
+function calculateAverageRating() {
+
+}
