@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bar chart</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+<script>
+    const product=['coffee Mixer2','Dyson','Styler','smart Moniter','MV5'];
+    const initalData=product.map(()=>Math.floor(Math.random()*10));
+
+    const ctx=document.getElementById('myChart');
+    new Chart(ctx, {
+        type:'bar',
+        data:{
+            labels:['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets:[{
+                label:'# of Product',
+                data:[12,19,3,5,2,3],
+                backgroundColor:[
+
+                ]
+                boarderWidth:1
+            }]
+        },
+        options:{
+            scales:{
+                y:{
+                    beginAtZero:true
+                }
+            }
+        }
+    })
+</script>
+
+
+</body>
+</html>

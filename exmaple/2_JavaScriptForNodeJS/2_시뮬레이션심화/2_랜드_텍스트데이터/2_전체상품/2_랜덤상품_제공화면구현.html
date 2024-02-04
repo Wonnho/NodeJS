@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 상품 추천</title>
+</head>
+<body>
+<script>
+    // 5개의 인기 상품 배열
+    const popularProducts = ["인기상품1", "인기상품2", "인기상품3", "인기상품4", "인기상품5"];
+
+    // 랜덤으로 인덱스 선택
+    const randomIndex = Math.floor(Math.random() * popularProducts.length);
+
+    // 추천 상품 출력
+    const recommendedProduct = popularProducts[randomIndex];
+
+    // HTML 문서에 결과 출력
+    document.write("추천 상품: " + recommendedProduct);
+</script>
+</body>
+</html>

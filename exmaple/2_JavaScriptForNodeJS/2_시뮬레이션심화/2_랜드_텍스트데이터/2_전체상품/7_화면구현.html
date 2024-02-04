@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>추천상품 차트</title>
+    <!-- Chart.js 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 50%; /* 테이블 폭 조절 */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>추천상품 차트</h2>
+
+<!-- 테이블 -->
+<table>
+    <tr>
+        <th>상품 이름</th>
+        <th>평균 평점</th>
+    </tr>
+    <!-- 각 상품 정보 출력 -->
+    <script>
+        var top5Recommendations = [
+            { name: '상품1', averageRating: 4.25 },
+            { name: '상품2', averageRating: 3.8 },
+            { name: '상품3', averageRating: 4.5 },
+            { name: '상품4', averageRating: 4.0 },
+            { name: '상품5', averageRating: 4.75 }
+        ];
+
+        for (var i = 0; i < top5Recommendations.length; i++) {
+            document.write('<tr>');
+            document.write('<td>' + top5Recommendations[i].name + '</td>');
+            document.write('<td>' + top5Recommendations[i].averageRating + '</td>');
+            document.write('</tr>');
+        }
+    </script>
+</table>
+
+<div style="width:60%; margin:auto;">
+<!-- 수직 막대차트 -->
+<canvas id="myChart"></canvas>
+</div>
+
+<!-- JavaScript로 수직 막대차트 생성 -->
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top5Recommendations.map(product => product.name),
+            datasets: [{
+                label: '평균 평점',
+                data: top5Recommendations.map(product => product.averageRating),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

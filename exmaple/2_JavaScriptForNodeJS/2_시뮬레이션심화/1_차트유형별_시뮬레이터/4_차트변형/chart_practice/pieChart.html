@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PieChart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div style="width: 60%; margin: auto;">
+  <canvas id="genderChart"></canvas>
+</div>
+
+<script>
+  const ctx=document.getElementById('genderChart').getContext('2d');
+
+  const sex={
+    labels:['Man','Woman'],
+    datasets:[{
+      label:'Shoes Star',
+      backgroundColor:[
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 99, 132, 0.2)'
+      ],
+      borderColor:[
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 99, 132, 1)'
+      ],
+      boarderWidth: 1
+    }]
+  };
+
+  const config={
+    type:'pie',
+    data: sex,
+    options:{
+      responsive:true,  // adjust chart size; refer to style="width: 60%; margin: auto;"
+
+    }
+  }
+</script>
+</body>
+</html>
+<!--Responsive Charts-->
+<!--When it comes to changing the chart size based on the window size, a major limitation is that the canvas render size (canvas.width and .height) can not be expressed with relative values, contrary to the display size (canvas.style.width and .height). Furthermore, these sizes are independent of each other and thus the canvas render size does not adjust automatically based on the display size, making the rendering inaccurate.-->
+
+<!--The following examples do not work:-->
+
+<!--<canvas height="40vh" width="80vw">: invalid values, the canvas doesn't resize (example )-->
+<!--  <canvas style="height:40vh; width:80vw">: invalid behavior, the canvas is resized but becomes blurry (example )-->
+<!--    <canvas style="margin: 0 auto;">: invalid behavior, the canvas continually shrinks. Chart.js needs a dedicated container for each canvas and this styling should be applied there.-->
+<!--      Chart.js provides a few options to enable responsiveness and control the resize behavior of charts by detecting when the canvas display size changes and update the render size accordingly.-->
+
+<!--      Configuration Options-->
+<!--      Namespace: options-->
+
+<!--      Name	Type	Default	Description-->
+<!--      responsive	boolean	true	Resizes the chart canvas when its container does (important note...).-->
+<!--      maintainAspectRatio	boolean	true	Maintain the original canvas aspect ratio (width / height) when resizing.-->
+<!--      aspectRatio	number	1|2	Canvas aspect ratio (i.e. width / height, a value of 1 representing a square canvas). Note that this option is ignored if the height is explicitly defined either as attribute or via the style. The default value varies by chart type; Radial charts (doughnut, pie, polarArea, radar) default to 1 and others default to 2.-->
+<!--      onResize	function	null	Called when a resize occurs. Gets passed two arguments: the chart instance and the new size.-->
+<!--      resizeDelay	number	0	Delay the resize update by the given amount of milliseconds. This can ease the resize process by debouncing the update of the elements.-->
+<!--      https://www.chartjs.org/docs/latest/configuration/responsive.html-->
