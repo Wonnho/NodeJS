@@ -1,0 +1,17 @@
+<!-- index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForEach 예제</title>
+</head>
+<body>
+<h1>과일 목록</h1>
+<ul>
+    <% fruits.forEach(function(fruit) { %>
+        <li><%= fruit %></li>
+    <% }); %>
+</ul>
+</body>
+</html>

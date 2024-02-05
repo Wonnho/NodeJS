@@ -1,0 +1,17 @@
+
+<html>
+<title>양수판별</title>
+<meta>
+<body>
+<h1>Welcome to EJS</h1>
+<form action="processInput" method="post">
+    <label for="inputNumber">enter a Number</label>
+    <input type="text" id="inputNumber" name="inputNumber" required>
+    <button type="submit">Submit</button>
+</form>
+
+<% if(result) {%>
+<p><%=result %></p>
+<% } %>
+</body>
+</html>
