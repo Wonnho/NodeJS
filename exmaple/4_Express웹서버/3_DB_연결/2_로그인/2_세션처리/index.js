@@ -30,13 +30,21 @@ const server = app.listen(3000, ()=> {
 
 
 //정적인 파일 참조를 niginx html 폴더로 지정
-const WEB_SERVER_HOME='C:\\wonnho\\Util\\nginx-1.24.0\\html'
+//개발환경
+//const WEB_SERVER_HOME='C:\\wonnho\\Util\\nginx-1.24.0\\html'
 
+//aws
+const WEB_SERVER_HOME='/usr/share/nginx/html'
 
 
 app.use('/', express.static(WEB_SERVER_HOME + '/'));
+//개발환경
+//oracledb.initOracleClient(({libDir:'../../instantclient_21_13'}))
 
-oracledb.initOracleClient(({libDir:'../../instantclient_21_13'}))
+//aws 환경
+oracledb.initOracleClient({libDir:'/usr/lib/oracle/21/client64/lib/'});
+
+
 
 app.post('/login', bodyParser.urlencoded({ extended: false }),
     async (req, res) => {
