@@ -66,7 +66,7 @@ app.post('/login', bodyParser.urlencoded({ extended: false }),
         res.render('welcome',{username});
 
     } else {
-        res.render('loginfail',{username})
+        res.render('loginFail',{username})
     }
     });
 

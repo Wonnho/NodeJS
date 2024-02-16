@@ -1,0 +1,57 @@
+<!-- 게시판 메인 페이지 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>게시판</h1>
+<!-- 게시글 목록 표시 -->
+<table>
+    <thead>
+    <tr>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+    </tr>
+    </thead>
+    <tbody>
+
+<!--
+
+-->
+    <% for(let k=0; k< posts.length;k++) {%>
+
+        <tr>
+            <th><%=posts[k][0] %></th>
+            <th><%=posts[k][1]%></th>
+            <th><%=posts[k][2]%></th>
+            <th><%=posts[k][3]%></th>S
+        </tr>
+    <%}%>
+
+    </tbody>
+</table>
+
+</body>
+</html>

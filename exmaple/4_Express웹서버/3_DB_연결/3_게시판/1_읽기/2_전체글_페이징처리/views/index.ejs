@@ -1,0 +1,74 @@
+<!-- 게시판 메인 페이지 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>게시판</h1>
+<!-- 게시글 목록 표시 -->
+<table>
+    <thead>
+    <tr>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for (let i = 0; i < posts.length; i++) { %>
+        <tr>
+            <td><%= posts[i][0] %></td>
+            <td><%= posts[i][1] %></td>
+            <td><%= posts[i][2] %></td>
+            <td><%= posts[i][3] %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<script>
+    console.log(<%= startPage %>);
+</script>
+<!-- 페이징 -->
+<div>
+<!-- currentPage가 1보다 크면 이전 링크로 이동할 수 있는 조건   -->
+<!-- "/?page=[페이지번호] => 쿼리파라메터로 get 방식인 경우에 url에 파라메터 값을 지정하여 넘길 수 있다.   -->
+    <% if (currentPage > 1) { %>
+        <a href="/?page=<%= currentPage - 1 %>">이전</a>
+    <% } %>
+
+    <% for (let i = startPage; i <= endPage; i++) { %>
+        <% if (i === currentPage) { %>
+            <span class="current-page"><%= i %></span>
+        <% } else { %>
+            <a href="/?page=<%= i %>"><%= i %></a>
+        <% } %>
+    <% } %>
+
+<!-- 현재 페이지에서 한 화면에 처리하는 페이지 갯수 보다 하나라도 더 많으면 다음 링크로 이동할 수 있는 조건   -->
+    <% if ( (totalPages - currentPage +1) > maxPageNumber ) { %>
+        <a href="/?page=<%= currentPage + 1 %>">다음</a>
+    <% } %>
+</div>
+</body>
+</html>
