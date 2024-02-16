@@ -1,0 +1,4 @@
+조회수 변경사항 커밋
+oracledb.autoCommit = true;
+
+댓글추가시 post id 넘겨주기

@@ -33,9 +33,11 @@ app.get('/', async (req, res) => {
             `SELECT COUNT(*) AS total FROM posts`
         );
         const totalPosts = result.rows[0];
+        // 사용자 입장에서 수정해야할 상수:postPerPage
         const postsPerPage = 10; // 한 페이지에 표시할 게시글 수
         const totalPages = Math.ceil(totalPosts / postsPerPage); // 총 페이지 수 계산
-
+        // usage of query parameter
+        //req.query.[variable of query parameter]
         let currentPage = req.query.page ? parseInt(req.query.page) : 1; // 현재 페이지 번호
         // current Page가 1이면 startRow는 1, endRow는 10
         // current Page가 2이면 startRow는 11, endRow는 20
@@ -57,7 +59,7 @@ app.get('/', async (req, res) => {
                 endRow: endRow
             }
         );
-
+        // 사용자 입장에서 수정해야할 상수:postPerPage
         const MAX_PAGE_LIMIT = 5;
         // 5개씩 페이징 처리를 하기 위해 화면에 보이는 페이지 번호를 계산
         // 현재 페이지를 중심으로 전체 페이지에서 현재페이지를 뺀 값이 5(한 화면에 페이징하는 갯수)보다 작다면 시작 페이지를 조정한다.
