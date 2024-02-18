@@ -1,0 +1,31 @@
+<!-- addComment.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>댓글 추가</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 200px; /* 댓글 내용을 입력할 텍스트 영역의 높이를 조정합니다. */
+        }
+    </style>
+</head>
+<body>
+<h1>댓글 추가</h1>
+<form action="/addComment" method="post">
+    <div>
+        <label for="author">작성자:</label>
+        <input type="text" id="author" name="author" value="<%= userName %>" required> <!-- username을 기본값으로 설정 -->
+    </div>
+    <div>
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required></textarea>
+    </div>
+    <input type="hidden" name="postId" value="<%= postId %>">
+    <button type="submit">댓글 추가</button>
+</form>
+<a href="/detailPost/<%= postId %>?user_id=<%= userId %>&username=<%= userName %>&user_realname=<%= userRealName %>" class="button">이전 화면으로 돌아가기</a>
+</body>
+</html>
