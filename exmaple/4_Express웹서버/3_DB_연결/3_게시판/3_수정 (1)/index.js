@@ -7,8 +7,7 @@ const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
-// const WEB_SERVER_HOME = 'D:\\HKLee\\Util\\nginx-1.24.0\\html';
-const WEB_SERVER_HOME = 'C:\\wonnho\\Util\\nginx-1.24.0\\html';
+const WEB_SERVER_HOME = 'D:\\HKLee\\Util\\nginx-1.24.0\\html';
 app.use('/', express.static(WEB_SERVER_HOME+ '/'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
@@ -20,12 +19,12 @@ app.use(session({
 // Oracle 데이터베이스 연결 설정
 const dbConfig = {
     user: 'open_source',
-    password: '111',
+    password: '1111',
     connectString: 'localhost:1521/xe'
 };
 
 app.set('view engine', 'ejs');
-oracledb.initOracleClient({ libDir: '../../../instantclient_21_13' });
+oracledb.initOracleClient({ libDir: '../../instantclient_21_13' });
 oracledb.autoCommit = true;
 
 // express-session 미들웨어 설정
@@ -37,10 +36,14 @@ app.use(session({
 // 게시판 메인 페이지 렌더링
 app.get('/boardMain', async (req, res) => {
     let conn;
+    // const userId = req.query.id;
+    // const userName = req.query.username;
+    // const userRealName = req.query.name;
 
-    const loggedInUserId = req.session.loggedInUserId;
-    const loggedInUserName = req.session.loggedInUserName;
-    const loggedInUserRealName = req.session.loggedInUserRealName;
+    const userId = req.session.userId;
+    const userName = req.session.username;
+    const userRealName = req.session.userRealName;
+    // console.log(`userId: ${userID}, userName: ${userName}, userRealName: ${userRealName}`);
     try {
         conn = await oracledb.getConnection(dbConfig);
         let result = await conn.execute(
@@ -53,47 +56,21 @@ app.get('/boardMain', async (req, res) => {
         let currentPage = req.query.page ? parseInt(req.query.page) : 1; // 현재 페이지 번호
         const startRow = (currentPage - 1) * postsPerPage + 1;
         const endRow = currentPage * postsPerPage;
-        console.log(`startRow: ${startRow}, endRow: ${endRow}, 정렬방식: ${req.query.sort} `);
-
-        // 정렬 방식에 따른 SQL 쿼리 작성
-        let orderByClause = 'ORDER BY p.created_at DESC'; // 기본적으로 최신순 정렬
-
-        if (req.query.sort === 'views_desc') {
-            orderByClause = 'ORDER BY p.views DESC, p.created_at DESC'; // 조회수 내림차순, 최신순
-        }
-
-        // 검색 조건에 따른 SQL 쿼리 작성
-        let searchCondition = ''; // 기본적으로 검색 조건 없음
-
-        if (req.query.searchType && req.query.searchInput) {
-            const searchType = req.query.searchType;
-            const searchInput = req.query.searchInput;
-
-            // 검색 조건에 따라 WHERE 절 설정
-            if (searchType === 'title') {
-                searchCondition = ` AND p.title LIKE '%${searchInput}%'`;
-            } else if (searchType === 'content') {
-                searchCondition = ` AND p.content LIKE '%${searchInput}%'`;
-            } else if (searchType === 'author') {
-                searchCondition = ` AND u.username LIKE '%${searchInput}%'`;
-            }
-        }
-
-        const sql_query = `SELECT
-                 id,title,author,to_char(created_at,'YYYY-MM-DD'),views, likes,
+        console.log(`startRow: ${startRow}, endRow: ${endRow}`);
+        // 작성자를 동명이인을 고려해 사용자 ID, 닉네임의 성격을 같는 username 열을 사용한다.
+        result = await conn.execute(
+            `SELECT
+                 id,title,author,to_char(created_at,'YYYY-MM-DD'),views,
                  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
              FROM (
                       SELECT
-                          p.id, p.title, u.username AS author, p.created_at, p.views, p.likes,
-                          ROW_NUMBER() OVER (${orderByClause}) AS rn
+                          p.id, p.title, u.username AS author, p.created_at, p.views, 
+                          ROW_NUMBER() OVER (ORDER BY p.id DESC) AS rn
                       FROM posts p
                                JOIN users u ON p.author_id = u.id
-                      WHERE 1=1
-                      ${searchCondition} 
                   ) p
              WHERE rn BETWEEN :startRow AND :endRow
-            `;
-        result = await conn.execute(sql_query,
+            `,
             {
                 startRow: startRow,
                 endRow: endRow
@@ -107,9 +84,9 @@ app.get('/boardMain', async (req, res) => {
         console.log(`result.rows[0].id: ${result.rows[0].id}`);
 
         res.render('index', {
-            userId: loggedInUserId,
-            userName: loggedInUserName,
-            userRealName: loggedInUserRealName,
+            userId: userId,
+            userName: userName,
+            userRealName: userRealName,
             posts: result.rows,
             startPage: startPage,
             currentPage: currentPage,
@@ -131,59 +108,17 @@ app.get('/boardMain', async (req, res) => {
     }
 });
 
-
 // 댓글 페이지 렌더링
 app.get('/addComment', (req, res) => {
     const postId = req.query.post_id; // postId 가져오기
-    const userId = req.session.loggedInUserId;
-    const username = req.session.loggedInUserName;
-    const userRealName = req.session.loggedInUserRealName;
+    const userId = req.query.user_id;
+    const username = req.query.username;
+    const userRealName = req.query.user_realname;
     res.render('addComment',{postId: postId, userId:userId, userName:username, userRealName:userRealName});
 });
-app.post('/addComment', async (req, res) => {
-    // 로그인 여부 확인
-    if (!req.session.loggedIn) {
-        return res.redirect('/login'); // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-    }
-
-    const post_id  = req.body.post_id;
-    const author_id = req.session.loggedInUserId;
-    const comment_id = req.body.comment_id; // req.body에서 comment_id를 가져옴
-    const { content } = req.body;
-
-    let conn;
-    try {
-        conn = await oracledb.getConnection(dbConfig);
-
-        // 댓글 추가
-        await conn.execute(
-            `INSERT INTO comments (id, post_id, author_id, content, parent_comment_id) 
-             VALUES (comment_id_seq.nextval, :post_id, :author_id, :content, :parent_id)`, // parend_id를 parent_id로 수정
-            [post_id, author_id, content, comment_id]
-        );
-
-        await conn.commit();
-
-        res.redirect(`/detailPost/${post_id}`);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-    } finally {
-        if (conn) {
-            try {
-                await conn.close();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-    }
-});
-
-
 
 // 로그인 페이지 렌더링
 app.get('/login', (req, res) => {
-
     // '/' 경로로의 요청은 Nginx에서 login.html을 처리하도록 리다이렉트
     res.redirect('/login.html');
 });
@@ -193,11 +128,15 @@ app.post('/login', bodyParser.urlencoded({ extended: false }), async (req, res) 
     const { username, password } = req.body;
     const authenticatedUser = await varifyID(username, password);
 
+    // console.log(`authenticatedUser.id: ${authenticatedUser.id}
+    //     authenticatedUser.username: ${authenticatedUser.username} authenticatedUser.name ${authenticatedUser.name}`);
+    // const id = authenticatedUser.id;
+    // const name = authenticatedUser.name;
     if (authenticatedUser) {
         req.session.loggedIn = true;
-        req.session.loggedInUserId = authenticatedUser.id; // 사용자 테이블의 ID (PK) 저장
-        req.session.loggedInUserName = username;           // 사용자 테이블의 username
-        req.session.loggedInUserRealName = authenticatedUser.name; // 사용자 테이블에서 실제 이름 저장
+        req.session.userId = authenticatedUser.id; // 사용자 ID 저장
+        req.session.username = username;
+        req.session.userRealName = authenticatedUser.name; // 사용자 실제 이름 저장
         // res.redirect(`/boardMain?id=${authenticatedUser.id}&username=${authenticatedUser.username}&name=${authenticatedUser.name}`);
         res.redirect(`/boardMain`);
         // res.redirect('welcome', { WEB_SERVER_HOME, username });
@@ -263,7 +202,7 @@ app.get('/create', (req, res) => {
 app.post('/create', async (req, res) => {
     console.log('Debug: post create');
     const { title, content } = req.body;
-    const authorId = req.session.loggedInUserId; // 현재 로그인한 사용자의 ID
+    const authorId = req.session.userId; // 현재 로그인한 사용자의 ID
     let conn;
     try {
         conn = await oracledb.getConnection(dbConfig);
@@ -308,9 +247,11 @@ app.get('/detailPost/:id', async (req, res) => {
     }
 
     const postId = req.params.id;
-    const userId = req.session.loggedInUserId;
-    const userName = req.session.loggedInUserName;
-    const userRealName = req.session.loggedInUserRealName;
+    const userId = req.params.user_id;
+    // const userName = req.query.username;
+    // const userRealName = req.query.user_realname;
+    const userName = req.session.username;
+    const userRealName = req.session.userRealName;
     console.log(`username: ${userName}`);
     let conn;
     try {
@@ -336,42 +277,12 @@ app.get('/detailPost/:id', async (req, res) => {
         );
 
         // 댓글 가져오기
-        const commentResult = await conn.execute(
-            `SELECT c.id, c.author_id, c.content, u.username AS author, TO_CHAR(c.created_at, 'YYYY-MM-DD HH:MM') AS created_at, c.parent_comment_id 
-            FROM comments c
-            JOIN users u ON c.author_id = u.id
-            WHERE c.post_id = :id
-            ORDER BY c.id`,
-            [postId],
-            { fetchInfo: { CONTENT: { type: oracledb.STRING } } }
-        );
 
         // 댓글과 댓글의 댓글을 구성
         const comments = [];
         const commentMap = new Map(); // 댓글의 id를 key로 하여 댓글을 맵으로 저장
 
-        commentResult.rows.forEach(row => {
-            const comment = {
-                id: row[0],
-                author_id: row[1],
-                content: row[2],
-                author: row[3],
-                created_at: row[4],
-                children: [], // 자식 댓글을 저장할 배열
-            };
 
-            const parentId = row[5]; // 부모 댓글의 id
-
-            if (parentId === null) {
-                // 부모 댓글이 null이면 바로 댓글 배열에 추가
-                comments.push(comment);
-                commentMap.set(comment.id, comment); // 맵에 추가
-            } else {
-                // 부모 댓글이 있는 경우 부모 댓글을 찾아서 자식 댓글 배열에 추가
-                const parentComment = commentMap.get(parentId);
-                parentComment.children.push(comment);
-            }
-        });
         const post = {
             id: postResult.rows[0][0],
             title: postResult.rows[0][1],
@@ -381,6 +292,9 @@ app.get('/detailPost/:id', async (req, res) => {
             views: postResult.rows[0][5],
             likes: postResult.rows[0][6]
         };
+        console.log(`post: ${post}, comments: ${comments}`);
+        console.log(`id: ${postResult.rows[0][0]}, content: ${postResult.rows[0][2]},
+         login username: ${userName} login userRealName: ${userRealName}`);
         res.render('detailPost', {
             post: post,
             userId: userId,
@@ -410,9 +324,9 @@ app.get('/editPost/:id', async (req, res) => {
     }
 
     const postId = req.params.id;
-    const userId = req.params.user_id;
-    const userName = req.query.username;
-    const userRealName = req.query.user_realname;
+    // const userId = req.params.user_id;
+    // const userName = req.query.username;
+    // const userRealName = req.query.user_realname;
     let conn;
     try {
         conn = await oracledb.getConnection(dbConfig);
@@ -431,10 +345,10 @@ app.get('/editPost/:id', async (req, res) => {
         };
 
         res.render('editPost', {
-            post: post,
-            userId: userId,
-            username: userName,
-            userRealName: userRealName
+            post: post
+            // userId: userId,
+            // username: userName,
+            // userRealName: userRealName
         });
     } catch (err) {
         console.error(err);
@@ -481,113 +395,6 @@ app.post('/editPost/:id', async (req, res) => {
                 console.error('오라클 연결 종료 중 오류 발생:', err);
             }
         }
-    }
-});
-// 삭제 처리
-app.get('/deletePost/:id', async (req, res) => {
-    // 로그인 여부 확인
-    if (!req.session.loggedIn) {
-        return res.redirect('/login'); // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-    }
-
-    const postId = req.params.id;
-    const userId = req.params.user_id;
-    const userName = req.query.username;
-    const userRealName = req.query.user_realname;
-
-    let conn;
-    try {
-        conn = await oracledb.getConnection(dbConfig);
-
-        // 게시글에 달린 댓글과 답글 삭제
-        await conn.execute(
-            `DELETE FROM comments WHERE post_id = :postId OR parent_comment_id IN (SELECT id FROM comments WHERE post_id = :postId)`,
-            [postId, postId]
-        );
-        // 변경 사항 커밋
-        await conn.commit();
-        // 게시글 삭제
-        await conn.execute(
-            `DELETE FROM posts WHERE id = :id`,
-            [postId]
-        );
-
-        // 변경 사항 커밋
-        await conn.commit();
-
-        // 삭제 후 게시판 메인 페이지로 리다이렉트
-        res.redirect(`/boardMain?id=${userId}&username=${userName}&name=${userRealName}`);
-    } catch (err) {
-        console.error('게시글 삭제 중 오류 발생:', err);
-        res.status(500).send('게시글 삭제 중 오류가 발생했습니다.');
-    } finally {
-        if (conn) {
-            try {
-                await conn.close();
-            } catch (err) {
-                console.error('오라클 연결 종료 중 오류 발생:', err);
-            }
-        }
-    }
-});
-
-// 댓글 삭제 처리
-app.post('/deleteComment/:id', async (req, res) => {
-    // 로그인 여부 확인
-    if (!req.session.loggedIn) {
-        return res.redirect('/login'); // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-    }
-
-    const commentId = req.params.id;
-    const postId = req.body.post_id;
-
-    let conn;
-    try {
-        conn = await oracledb.getConnection(dbConfig);
-
-        // 댓글 삭제
-        await conn.execute(
-            `DELETE FROM comments WHERE id = :id OR parent_comment_id = :parent_comment_id`,
-            { id: commentId, parent_comment_id: commentId }
-        );
-
-        // 변경 사항 커밋
-        await conn.commit();
-
-        // 삭제 후 상세 페이지로 리다이렉트
-        res.redirect(`/detailPost/${postId}`);
-    } catch (err) {
-        console.error('댓글 삭제 중 오류 발생:', err);
-        res.status(500).send('댓글 삭제 중 오류가 발생했습니다.');
-    } finally {
-        if (conn) {
-            try {
-                await conn.close();
-            } catch (err) {
-                console.error('오라클 연결 종료 중 오류 발생:', err);
-            }
-        }
-    }
-});
-
-// 댓글 수정 엔드포인트 추가
-app.post('/editComment/:commentId', async (req, res) => {
-    const { commentId } = req.params; // 요청에서 댓글 ID 가져오기
-    const { content, post_id } = req.body; // 요청에서 수정된 내용 가져오기
-
-    try {
-        // 댓글 수정 쿼리 실행
-        const connection = await oracledb.getConnection(dbConfig);
-        const result = await connection.execute(
-            `UPDATE comments SET content = :content WHERE id = :commentId`,
-            { content, commentId }
-        );
-        // 삭제 후 상세 페이지로 리다이렉트
-        res.redirect(`/detailPost/${post_id}`);
-    } catch (error) {
-        // 댓글 수정 실패 시 에러 응답 반환
-        console.error('댓글 수정 에러:', error);
-        res.status(500).send('댓글 수정 중 오류가 발생했습니다.');
     }
 });
 
