@@ -14,7 +14,7 @@
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
-            text-align: left;
+            text-align: center;
         }
 
         th {
@@ -27,10 +27,31 @@
         .post-link:hover {
             text-decoration: underline;
         }
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .paging-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .paging-container a {
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
 <h1>게시판</h1>
+<div style="position: absolute; top: 10px; right: 10px;">
+    <% if (userRealName) { %>
+        <p><%= userRealName %>님 환영합니다. &nbsp;&nbsp; <a href="/logout" class="button">로그아웃</a></p>
+    <% } else { %>
+        <a href="/login" class="button">로그인</a>
+    <% } %>
+</div>
 <!-- 게시글 목록 표시 -->
 <table>
     <thead>
@@ -42,15 +63,10 @@
     </tr>
     </thead>
     <tbody>
-<!--  게시글에 대해서 경로(Path) 형식으로 요청
- /URL/[경로명]
-  -->
     <% for (let i = 0; i < posts.length; i++) { %>
         <tr>
-
-            <td><a href="/detailPost/<%= posts[i][0] %>" class="post-link" %>">
-                <%= posts[i][1] %> [<%= posts[i][5] %>]</a></td>
-
+<!-- userName이 있던지 없던지  req.session.loggedIn 값에 의해 로그인 유무를 판단하기 때문에 아래와 같이 간략하게 가능 -->
+            <td><a href="/detailPost/<%= posts[i][0] %>" class="post-link"><%= posts[i][1] %> [<%= posts[i][5] %>]</a></td>
             <td><%= posts[i][2] %></td>
             <td><%= posts[i][3] %></td>
             <td><%= posts[i][4] %></td>
@@ -62,22 +78,30 @@
 <script>
     console.log(<%= startPage %>);
 </script>
+
+<!-- 글쓰기 버튼 -->
+<div class="button-container">
+    <% if (userRealName) { %>
+        <a href="/create" class="button">글쓰기</a>
+    <% } %>
+</div>
+
 <!-- 페이징 -->
-<div>
+<div class="paging-container">
     <% if (currentPage > 1) { %>
-        <a href="/?page=<%= currentPage - 1 %>">이전</a>
+        <a href="/boardMain/?page=<%= currentPage - 1 %>">이전</a>
     <% } %>
 
     <% for (let i = startPage; i <= endPage; i++) { %>
         <% if (i === currentPage) { %>
             <span class="current-page"><%= i %></span>
         <% } else { %>
-            <a href="/?page=<%= i %>"><%= i %></a>
+            <a href="/boardMain/?page=<%= i %>"><%= i %></a>
         <% } %>
     <% } %>
 
     <% if ( (totalPages - currentPage +1) > maxPageNumber ) { %>
-        <a href="/?page=<%= currentPage + 1 %>">다음</a>
+        <a href="/boardMain/?page=<%= currentPage + 1 %>">다음</a>
     <% } %>
 </div>
 </body>

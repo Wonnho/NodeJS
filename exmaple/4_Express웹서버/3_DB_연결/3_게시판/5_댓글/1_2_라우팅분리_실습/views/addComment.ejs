@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>댓글 추가</title>
+    <style>
+        /* 가운데 정렬 스타일 추가 */
+        .center {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        /* 입력 폼 스타일 */
+        form {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="center">
+    <h2>댓글 추가</h2>
+    <form action="/addComment?post_id=<%= postId %>&author_id=<%= userId %>" method="POST">
+        <label for="content">댓글 내용:</label><br>
+        <textarea id="content" name="content" rows="5" required></textarea><br>
+        <input type="submit" value="댓글 추가">
+    </form>
+    <a href="/detailPost/<%= postId %>?user_id=<%= userId %>&username=<%= userName %>&user_realname=<%= userRealName %>" class="button">취소</a>
+</div>
+</body>
+</html>
