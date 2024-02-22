@@ -75,6 +75,15 @@
         <th>제목</th>
         <th>작성자</th>
         <th>작성일</th>
+<!--
+* onmouseover="this.style.textDecoration = 'underline'":
+ - 사용자가 마우스를 해당 열 제목 위에 올렸을 때 호출되는 이벤트.
+ - 이벤트가 발생하면 해당 열 제목의 텍스트에 밑줄이 생기도록 스타일 변경.
+ * onmouseout="this.style.textDecoration = 'none'
+  - 사용자가 마우수를 해당 열 제목에서 벗어나 있는 상태에 호출 되는 이벤트
+  - 해당 상태에는 밑줄을 제거하도록 스타일 변경
+      -->
+
         <th onclick="toggleSort()" onmouseover="this.style.textDecoration = 'underline';" onmouseout="this.style.textDecoration = 'none';">조회수 ▼</th>
     </tr>
     </thead>
@@ -109,8 +118,10 @@
     };
 
     function toggleSort() {
+        // sortByViews라는 플래그 변수(상태를 저장하는 변수)를 지정하여 정렬상태를 토글(반전) 시킴
         sortByViews = !sortByViews;
         const sortParam = sortByViews ? 'views_desc' : ''; // 정렬 방식에 따른 쿼리 파라미터
+        // location 객체를 사용하여 지정된 URL로 이동 및 화면 갱신
         window.location.href = `/boardMain?sort=${sortParam}`;
     }
 </script>
@@ -145,6 +156,7 @@
 <!-- 검색 조건 -->
 <!-- 검색 조건 및 입력 창 -->
 <div id="searchContainer">
+<!-- 기존의 /boardMain이 get방식으로 처리되고 있어 편의상 GET 방식으로 호출   -->
     <form action="/boardMain" method="GET">
         <label for="searchType">검색 조건:</label>
         <select id="searchType" name="searchType">

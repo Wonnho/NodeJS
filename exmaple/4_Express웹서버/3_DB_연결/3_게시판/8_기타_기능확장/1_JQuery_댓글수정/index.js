@@ -36,6 +36,9 @@ app.use(session({
 }));
 // 게시판 메인 페이지 렌더링
 app.get('/boardMain', async (req, res) => {
+    console.log(req.query)
+    console.log(req.body)
+
     let conn;
 
     const loggedInUserId = req.session.loggedInUserId;
