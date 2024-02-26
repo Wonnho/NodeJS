@@ -7,7 +7,8 @@ const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
-const WEB_SERVER_HOME = 'D:\\HKLee\\Util\\nginx-1.24.0\\html';
+const WEB_SERVER_HOME = 'c:\\wonnho\\Util\\nginx-1.24.0\\html';
+
 app.use('/', express.static(WEB_SERVER_HOME+ '/'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
@@ -19,7 +20,7 @@ app.use(session({
 // Oracle 데이터베이스 연결 설정
 const dbConfig = {
     user: 'open_source',
-    password: '1111',
+    password: '111',
     connectString: 'localhost:1521/xe'
 };
 
