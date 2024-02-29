@@ -6,7 +6,7 @@ const session = require('express-session');
 const app = express();
 const port = 3000;
 
-
+//app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
@@ -25,7 +25,7 @@ const dbConfig = {
 
 // app.set('view engine', 'ejs');
 oracledb.initOracleClient({ libDir: '../../../instantclient_21_13' });
-app.get('/', async (req, res) => {
+app.get('/bulletin', async (req, res) => {
     let conn;
     try {
         conn = await oracledb.getConnection(dbConfig);
@@ -46,7 +46,6 @@ app.get('/', async (req, res) => {
         const endRow = currentPage * postsPerPage;
     //    console.log(`startRow: ${startRow}, endRow: ${endRow}`);
 
-
         let info_bulletin=await conn.execute(
             `SELECT post_id, writer, member, title, to_char(created_at,'YYYY-MM-DD'), views,
              (select count(*) from comments c where c.post_id=b.post_id) as comments_count
@@ -62,7 +61,7 @@ app.get('/', async (req, res) => {
                 endRow: endRow
             }
         );
-        console.log(info_bulletin);
+        console.log('bulletin',info_bulletin);
         const MAX_PAGE_LIMIT = 5;
         // 5개씩 페이징 처리를 하기 위해 화면에 보이는 페이지 번호를 계산
         // 현재 페이지를 중심으로 전체 페이지에서 현재페이지를 뺀 값이 5(한 화면에 페이징하는 갯수)보다 작다면 시작 페이지를 조정한다.
@@ -96,12 +95,73 @@ app.get('/', async (req, res) => {
     }
 });
 
-// 로그인 페이지 렌더링
-app.get('/login', (req, res) => {
+//로그인 페이지 렌더링
+app.get('/', (req, res) => {
 
-    res.redirect('/login');
+ res.render('login');
 });
 
+app.post('/login', async (req, res) => {
+    // 요청온거 확인
+    const { userId, userPw } = req.body;
+    const member_id = req.body.userId;
+    const member_pass= req.body.userPw;
+    console.log('username '+member_id)
+
+    console.log('password '+member_pass)
+
+    // SQL 쿼리 실행하고 결과 가져오기
+    const result = await varifyID(userId,userPw)
+    console.log(result)
+
+    // 결과에 따라서 어떤 응답 보내줄지 확인
+    if(result !== null){
+        console.log("로그인 성공")
+
+        // 로그인 성공한 기념으로 session에 데이터를 저장해 놓기로 합니다.
+        req.session.userNo = result.userNo
+        req.session.userId = result.userId
+        req.session.userName = result.userName
+
+        res.redirect('/bulletin') // redirect를 정보를 넘길 수 없다. render는 가능 { }
+    }else {
+        console.log("로그인 실패")
+        res.render('loginFail')
+    }
+
+});
+
+async function varifyID(userId,userPw) {
+    let connection;
+    try {
+        // DB 네트워크 상태가 안좋으면 connection 만드는 데부터 에러나므로 Try 내부에 넣음.
+
+
+        connection = await oracledb.getConnection(dbConfig);
+        const sql_query = 'SELECT member_id, member_name, member_num FROM member WHERE member_id = :userId AND member_pw = :userPw';
+        const result = await connection.execute(sql_query, {'userId': userId, 'userPw': userPw});
+
+
+        // 조회 결과에 행이 있으면 리턴하기
+        if (result.rows.length > 0) {
+            return {
+                'userId': result.rows[0][0],
+                'userName': result.rows[0][1],
+                'userNo': result.rows[0][2]
+            };
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('오류 발생:', error);
+        return null;
+    } finally {
+        // 연결정보 남아있으면 close
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
 //post_id is a primary key
 app.get('/bulletinDetail/:post_id',async(req,res)=>{
     const postId=req.params.post_id;
@@ -212,10 +272,69 @@ app.get('/write', (req,res)=>{
 
 app.post('/write/',async(req,res)=>{
     const {title,content}=req.body;
-   // const post_id=req.
+     const writer_id=req.session.userId;
+       let conn;
+     try {
+         conn=await oracledb.getConnection(dbConfig);
+         const result= await conn.execute(
+             `select post_id_seq.nextval from dual`
+         );
+
+         const post_id=result.rows[0][0];
+
+
+        //  const sql_CreatePost = `
+        //      select * from (
+        //          select p.id c.id from(
+        //                                   select p.id c.id from
+        //                                       post as p
+        //                                           join comment as c
+        //                                   where p.id = :p_id and c.id = :c_id
+        //
+        //                               )
+        //              p
+        //          join comment c
+        //          where p.id = :p_id and c.id = :c_id
+        //                    )
+        //          where id = :p_id
+        //  `
+        // [a,b,c,d,a,c,d]
+        //  {'p_id':p_id, 'c_id':c_id+10}
+
+         const sql_CreatePost = `
+             insert into bulletin (post_id, writer_id, title, content)
+             values (:post_id, :writer_id, :title, :content)
+         `
+         const bind = {
+             'post_id': post_id,
+             'writer_id': writer_id,
+             'title': title,
+             'content': content
+         }
+         await conn.execute(sql_CreatePost, bind)
+
+         await conn.commit();
+         res.redirect('/bulletin');
+     } catch (err) {
+         console.error(err);
+         res.status(500).send('글 작성 중 오류 발생');
+     }
+     finally {
+         if(conn) {
+             try {
+                 await conn.close();
+             } catch (err) {
+                 console.error('오라클 연결 종료 중 오류 발생',err);
+             }
+         }
+     }
 })
 
 app.get('/edit/:post_id', async(req,res)=>{
+   if(!req.session.userId) {
+       return res.redirect('/login');
+   }
+
     const post_id=req.params.post_id;
 
     let conn;
@@ -223,7 +342,7 @@ app.get('/edit/:post_id', async(req,res)=>{
         conn=await oracledb.getConnection(dbConfig);
         const result=await conn.execute(
             `select * from bulletin where post_id=:post_id`,
-            [postId],
+            [post_id],
             { fetchInfo: { CONTENT: { type: oracledb.STRING } } }
         );
 
@@ -253,6 +372,6 @@ app.get('/edit/:post_id', async(req,res)=>{
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}/login`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
 

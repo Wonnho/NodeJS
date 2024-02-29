@@ -126,8 +126,8 @@
 <!-- 이전 페이지로 돌아가기 버튼 -->
 <div class="bottoms">
     <a href="/" class="button">게시판</a>
-    <a href="/edit/<%= bulletin.post_id %>" class="button">수 정</a>
-    <a href="/addComment?postId=<%=bulletin.post_id %>&comment_id=<%=bulletin.comment_id%>" class="button">댓 글</a>
+    <a href="/edit/<%= bulletin.post_id %>?user_id=<%= userId %>&username=<%= username %>" class="button">수 정</a>
+    <a href="/addComment?postId=<%=.post_id %>&comment_id=<%=bulletin.comment_id%>" class="button">댓 글</a>
 </div>
 </body>
 </html>

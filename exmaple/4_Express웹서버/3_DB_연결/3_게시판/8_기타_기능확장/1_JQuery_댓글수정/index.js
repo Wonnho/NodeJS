@@ -279,7 +279,8 @@ app.post('/create', async (req, res) => {
 
         // 게시글 삽입
         await conn.execute(
-            `INSERT INTO posts (id, author_id, title, content) VALUES (:id, :authorId, :title, :content)`,
+            `INSERT INTO posts (id, author_id, title, content)
+             VALUES (:id, :authorId, :title, :content)`,
             [postId, authorId, title, content]
         );
 
