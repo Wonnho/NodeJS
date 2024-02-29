@@ -1,0 +1,90 @@
+<!-- addComment.ejs -->
+<!-- 편의상 ejs로 작성, 추후 정적파일로 작성 가능-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>댓글 추가</title>
+    <style>
+    /* 가운데 정렬 스타일 추가 */
+    .center {
+    text-align: center;
+    margin-top: 50px;
+    }
+
+    /* 입력 폼 스타일 */
+    form {
+    width: 50%;
+    margin: 0 auto;
+    }
+
+
+    input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+    }
+
+    input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    }
+
+    input[type="submit"]:hover {
+    background-color: #45a049;
+    }
+    button[type="submit"] {
+        width: 200px;
+        height: 50px;
+        margin-left: 20px;
+        background-color: #8bacb9;
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 25px;
+        /*box-shadow: 0 9px #999;*/
+        transition: all 0.3s;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #3e8e41;
+        transform: translateY(-2px);
+    }
+
+    button[type="submit"]:active {
+        transform: translateY(2px);
+        /*box-shadow: 0 5px #666;*/
+    }
+    </style>
+</head>
+<body>
+
+<form action="/addComment" method="post">
+    <div>
+        <label for="member">작성자</label>
+        <input type="text" id="member" name="member" required>
+    </div>
+    <div>
+        <label for="content">내용</label>
+        <textarea id="content" name="content"
+                  cols="30" rows="5" placeholder="자신의 의견을 간단히 적어주세요." required></textarea>
+    </div>
+    <input type="hidden" name="postId" value="<%= postId %>">
+    <input type="hidden" name="commentId" value="<%= comment_id %>">
+    <button type="submit">댓글 추가</button>
+</form>
+</body>
+</html>
