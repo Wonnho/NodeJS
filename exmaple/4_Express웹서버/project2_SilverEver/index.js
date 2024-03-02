@@ -15,6 +15,8 @@ app.use(session({
     saveUninitialized: true
 }));
 
+const methodOverride = require('method-override')
+app.use(methodOverride('_method'))
 
 // Oracle 데이터베이스 연결 설정
 const dbConfig = {
@@ -61,7 +63,7 @@ app.get('/bulletin', async (req, res) => {
                 endRow: endRow
             }
         );
-        console.log('bulletin',info_bulletin);
+      //  console.log('bulletin',info_bulletin);
         const MAX_PAGE_LIMIT = 5;
         // 5개씩 페이징 처리를 하기 위해 화면에 보이는 페이지 번호를 계산
         // 현재 페이지를 중심으로 전체 페이지에서 현재페이지를 뺀 값이 5(한 화면에 페이징하는 갯수)보다 작다면 시작 페이지를 조정한다.
@@ -72,7 +74,8 @@ app.get('/bulletin', async (req, res) => {
         const endPage = Math.min(startPage + MAX_PAGE_LIMIT - 1, totalPages);
       //  console.log(`totalPages: ${totalPages}, currentPage: ${currentPage}, startPage: ${startPage}, endPage: ${endPage}`);
 
-        res.render('index',{
+        res.render('bulletin',{
+
             bulletin:info_bulletin.rows,
             startPage: startPage,
             currentPage: currentPage,
@@ -104,14 +107,15 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
     // 요청온거 확인
     const { userId, userPw } = req.body;
-    const member_id = req.body.userId;
-    const member_pass= req.body.userPw;
-    console.log('username '+member_id)
-
-    console.log('password '+member_pass)
+    // const member_id = req.body.userId;
+    // const member_pass= req.body.userPw;
+    // console.log('username '+member_id)
+    //
+    // console.log('password '+member_pass)
 
     // SQL 쿼리 실행하고 결과 가져오기
-    const result = await varifyID(userId,userPw)
+    const result = await varifyID(userId,userPw);
+
     console.log(result)
 
     // 결과에 따라서 어떤 응답 보내줄지 확인
@@ -138,7 +142,8 @@ async function varifyID(userId,userPw) {
 
 
         connection = await oracledb.getConnection(dbConfig);
-        const sql_query = 'SELECT member_id, member_name, member_num FROM member WHERE member_id = :userId AND member_pw = :userPw';
+        const sql_query = 'SELECT member_id, member_name, member_num FROM member' +
+            ' WHERE member_id = :userId AND member_pw = :userPw';
         const result = await connection.execute(sql_query, {'userId': userId, 'userPw': userPw});
 
 
@@ -176,7 +181,7 @@ app.get('/bulletinDetail/:post_id',async(req,res)=>{
 
         //get info about individual post
         const onePost=await conn.execute(
-            `select b.title, m.member_name, DBMS_LOB.SUBSTR(b.content, 4000, 1) AS content, TO_CHAR(b.created_at, 'YYYY-MM-DD') AS created_at, b.views 
+            `select b.title, m.member_id, DBMS_LOB.SUBSTR(b.content, 4000, 1) AS content, TO_CHAR(b.created_at, 'YYYY-MM-DD') AS created_at, b.views, b.post_id 
             FROM bulletin b 
             join member m on b.writer_id=m.member_id
             where b.post_id=:post_id`,
@@ -184,17 +189,20 @@ app.get('/bulletinDetail/:post_id',async(req,res)=>{
             {fetchInfo:{content:{type:oracledb.STRING }}}
         );
 
-        console.log('onePost:',onePost);
+   //     console.log('onePost:',onePost);
         const comments=[];
 
         // renew post of bulletin
         const bulletin ={
             title:onePost.rows[0][0],
-            member:onePost.rows[0][1],
+            member_id:onePost.rows[0][1],
             content:onePost.rows[0][2],
             created_at:onePost.rows[0][3],
-            views:onePost.rows[0][4]
+            views:onePost.rows[0][4],
+            post_id:onePost.rows[0][5]
         };
+
+        console.log('bulletin:',bulletin);
 
           res.render('bulletinDetail',{
               bulletin:bulletin,
@@ -283,23 +291,7 @@ app.post('/write/',async(req,res)=>{
          const post_id=result.rows[0][0];
 
 
-        //  const sql_CreatePost = `
-        //      select * from (
-        //          select p.id c.id from(
-        //                                   select p.id c.id from
-        //                                       post as p
-        //                                           join comment as c
-        //                                   where p.id = :p_id and c.id = :c_id
-        //
-        //                               )
-        //              p
-        //          join comment c
-        //          where p.id = :p_id and c.id = :c_id
-        //                    )
-        //          where id = :p_id
-        //  `
-        // [a,b,c,d,a,c,d]
-        //  {'p_id':p_id, 'c_id':c_id+10}
+
 
          const sql_CreatePost = `
              insert into bulletin (post_id, writer_id, title, content)
@@ -336,6 +328,7 @@ app.get('/edit/:post_id', async(req,res)=>{
    }
 
     const post_id=req.params.post_id;
+   // const member_id=req.body.userId;
 
     let conn;
     try {
@@ -348,14 +341,17 @@ app.get('/edit/:post_id', async(req,res)=>{
 
         const post={
             post_id:result.rows[0][0],
+            writer_id:result.rows[0][1],
             title: result.rows[0][2],
             content: result.rows[0][3]
         };
 
-       // console.log('post from edit',post);
+        console.log('post from edit',post);
         res.render('edit', {
-          post:post
-        })
+          post:post,
+
+
+                })
     }catch (err) {
          console.error(err);
          res.status(500).send('internal server error');
@@ -370,7 +366,72 @@ app.get('/edit/:post_id', async(req,res)=>{
 
     }
 });
+app.put('/edit/:post_id', async (req,res)=>{
 
+    const {title,content}=req.body;
+    const post_id=req.params.post_id;
+  //  const member_id=req.params.member_id;
+
+    let conn;
+    try {
+        conn=await oracledb.getConnection(dbConfig);
+       await conn.execute(
+       `update bulletin set title=:title, content=:content where post_id=:post_id`,
+       [title, content,post_id]
+    );
+   // console.log('수정 후 페이지 게시글 번호',bulletin.post_id);
+    await conn.commit();
+
+    res.redirect(`/bulletinDetail/${post_id}?writer_id=${req.session.userId}`);
+} catch(err) {
+    console.log('게시글 수정 중 오류 발생:',err);
+    } finally {
+        if(conn) {
+            try {
+                await conn.close();
+            } catch (err) {
+                console.error('오라클 연결 종료 중 오류 발생:',err);
+            }
+        }
+    }
+});
+
+app.get('/delete/:post_id', async (req,res)=>{
+    if(!req.session.loggedIn) {
+        return res.redirect('/login');
+    }
+    const post_id=req.params.post_id;
+    const userId=req.session.userId;
+   // const member_id=req.session.username;
+
+
+    let conn;
+    try {
+        conn=await oracledb.getConnection(dbConfig);
+        await conn.execute(
+            `delete from bulletin where post_id=:post_id`,
+            [post_id]
+
+        );
+
+        console.log('posts from delete',post_id);
+
+        await conn.commit();
+
+        res.redirect(`/bulletin?post_id=${post_id}&member_id=${req.session.userId}`);
+
+    } catch (err) {
+        console.log('게시글 삭제 중 오류 발생:',err);
+    } finally {
+        if(conn) {
+            try{
+                await conn.close();
+            } catch (err) {
+                console.error('오라클 연결 종료 중 오류 발생:',err);
+            }
+        }
+    }
+})
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

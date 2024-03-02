@@ -453,7 +453,8 @@ app.post('/editPost/:id', async (req, res) => {
 
         // 게시글 수정
         await conn.execute(
-            `UPDATE posts SET title = :title, content = :content WHERE id = :id`,
+            `UPDATE posts SET title = :title, content = :content 
+             WHERE id = :id`,
             [title, content, postId]
         );
 

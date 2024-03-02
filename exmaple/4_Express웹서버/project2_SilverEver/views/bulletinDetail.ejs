@@ -84,7 +84,7 @@
     <tr>
         <th>글쓴이</th>
 
-        <td class="member"><%= bulletin.member%></td>
+        <td class="member_id"><%= bulletin.member_id%></td>
     </tr>
     <tr>
         <th>게시글 내용</th>
@@ -105,12 +105,12 @@
             <% if (bulletin.comments && bulletin.comments.length > 0) { %>
                 <% bulletin.comments.forEach(comment=>{ %>
                     <div class="comment">
-                        <p><strong><%=comment.member %></strong>:<%=comment.content %></p>
+                        <p><strong><%=comment.member_id %></strong>:<%=comment.content %></p>
                       <%  if(comment.children.length>0){ %>
                         <div class="children">
                             <% comment.children.forEach(child=>{ %>
                                 <div class="comment" style="">
-                                    <p><strong><%=child.member %></strong>:<%= child.content %> </p>
+                                    <p><strong><%=child.member_id %></strong>:<%= child.content %> </p>
                                 </div>
                         <%  }); %>
                         </div>
@@ -125,9 +125,10 @@
 </table>
 <!-- 이전 페이지로 돌아가기 버튼 -->
 <div class="bottoms">
-    <a href="/" class="button">게시판</a>
-    <a href="/edit/<%= bulletin.post_id %>?user_id=<%= userId %>&username=<%= username %>" class="button">수 정</a>
-    <a href="/addComment?postId=<%=.post_id %>&comment_id=<%=bulletin.comment_id%>" class="button">댓 글</a>
+    <a href="/bulletin/" class="button">게시판</a>
+    <a href="/edit/<%= bulletin.post_id%>?member_id=<%=bulletin.member_id%>" class="button">수 정</a>
+    <a href="/addComment?postId=<%=bulletin.post_id %>&comment_id=<%=bulletin.comment_id%>" class="button">댓 글</a>\
+    <a href="/delete/<%=bulletin.post_id%>" class="button">삭제</a>
 </div>
 </body>
 </html>
