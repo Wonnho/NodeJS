@@ -189,8 +189,41 @@ app.get('/bulletinDetail/:post_id',async(req,res)=>{
             {fetchInfo:{content:{type:oracledb.STRING }}}
         );
 
-   //     console.log('onePost:',onePost);
+        const commentResult=await conn.execute(
+            `select c.post_id, c.content, m.member_id as member,  TO_CHAR(c.created_at, 'YYYY-MM-DD') AS created_at, c.parent_comment_id
+            from comments c
+            join member m on c.writer_id=m.member_id
+            where c.post_id= :post_id
+            order by c.post_id`,
+            [postId],
+            {fetchInfo:{ content:{type:oracledb.STRING}}}
+        );
+
+        console.log('commentResult',commentResult);
         const comments=[];
+   //     const commentMap=new Map();
+
+      commentResult.rows.forEach(row=>{
+          const comment={
+              post_id:row[1],
+              writer_id:row[2],
+              content:row[3],
+              created_at: row[4],
+              children:[],
+          };
+
+          const parentId=row[5];
+
+          if (parentId === null) {
+              // 부모 댓글이 null이면 바로 댓글 배열에 추가
+              comments.push(comment);
+              commentMap.set(comment.post_id, comment); // 맵에 추가
+          } else {
+              // 부모 댓글이 있는 경우 부모 댓글을 찾아서 자식 댓글 배열에 추가
+              const parentComment = commentMap.get(parentId);
+              parentComment.children.push(comment);
+          }
+      });
 
         // renew post of bulletin
         const bulletin ={
@@ -206,6 +239,7 @@ app.get('/bulletinDetail/:post_id',async(req,res)=>{
 
           res.render('bulletinDetail',{
               bulletin:bulletin,
+              // userId:userId,
               comments:comments
           });
     }catch(err) {
@@ -223,36 +257,41 @@ app.get('/bulletinDetail/:post_id',async(req,res)=>{
 } );
 
 app.get('/addComment',(req,res)=>{
-const postId=req.query.post_id;
+const post_id=req.query.post_id;
+const member_id=req.session.loggedInUserId;
 const comment_id=req.query.commentId;
-res.render('addComment',{postId:postId, });
+res.render('addComment',{post_id:post_id,member_id:member_id });
 });
+
 
 app.post('/addComment', async (req,res)=>{
 
-    // if (!req.session.loggedIn) {
-    //     return res.redirect('/login'); // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-    // }
+    if (!req.session.loggedIn) {
+        return res.redirect('/login'); // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+    }
 
 
-    const post_id=req.body.postId;
-    const member=req.body.member;
-    const comment_id=req.body.commentId;
+    const {post_id,writer_id}=req.query;
     const {content}=req.body;
+
+    // const member=req.body.member_id;
+    // const comment_id=req.body.commentId;
+    //
+
 
     let conn;
     try {
         conn=await oracledb.getConnection(dbConfig);
 
         await conn.execute(
-            `insert into comments(post_id,member, content, parent_comment_id )
-              values(comment_id_seq.nextval,:member,:content,:parent_id)`,
-            [post_id,member,content,comment_id]
+            `insert into comments(id, post_id, writer_id, content)
+              values(comment_id_seq.nextval,:post_id, :writer_id,:content)`,
+            [post_id,writer_id,content,]
 
         );
 
         await conn.commit();
-        res.redirect(`/bulletinDetail/${post_id}`);
+        res.redirect(`/bulletinDetail/${post_id}?writer_id=${req.session.userId}`);
 
     } catch (err) {
         console.error(err);
